@@ -7,7 +7,7 @@ OBJCONV=objconv
 ASMFLAGS = -f bin -i src -Ox -w+all -i src/boot
 CFLAGS = -c -Wall -Wextra -O0 -ffreestanding
 STRIPFLAGS = -R .comment -R .gnu.version -R .note -R .eh_frame -R .eh_frame_hdr -R .note.gnu.property
-LDFLAGS = -O1 -Ttext 0x0 --oformat binary
+LDFLAGS = -O1 -Ttext 0x1000 --oformat binary
 OBJCONVFLAGS = -fnasm
 BOOT_SECT_BIN = boot_sect.bin
 BOOT_SECT_OBJS = $(patsubst %.s,%.s.o,$(wildcard src/boot/*.s))
@@ -21,7 +21,6 @@ os.img: $(BOOT_SECT_BIN) $(KERNEL_BIN)
 	cat $^ > $@
 
 $(BOOT_SECT_BIN): src/boot/boot_sect.s
-	$(ASM) $(ASMFLAGS) -e $^ >$(^F).s
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
 $(KERNEL_BIN): $(KERNEL_OBJS)
@@ -35,8 +34,7 @@ clean:
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.s.o: %.s
-	$(ASM) $(ASMFLAGS) -e $^ >$(^F).s
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
-run: os.img
-	- qemu-system-x86_64 -drive format=raw,file=$< 
+run: boot_sect.bin
+	- qemu-system-i386 -drive format=raw,file=$< -nographic
