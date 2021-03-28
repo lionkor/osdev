@@ -1,3 +1,4 @@
+%include "print.s"
 
 print_hex:
     pusha
@@ -67,7 +68,6 @@ print_hex:
     popa
     ret
 
-%include "print.asm"
 
 S_HEX_OUT:
     db '0x0000', 0
