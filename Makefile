@@ -37,4 +37,4 @@ clean:
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
 run: os.img
-	- qemu-system-x86_64 -drive format=raw,file=$< -nographic
+	- qemu-system-x86_64 -drive format=raw,file=$< 
