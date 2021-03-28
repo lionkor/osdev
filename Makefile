@@ -21,6 +21,7 @@ os.img: $(BOOT_SECT_BIN) $(KERNEL_BIN)
 	cat $^ > $@
 
 $(BOOT_SECT_BIN): src/boot/boot_sect.s
+	$(ASM) $(ASMFLAGS) -e $^ >$(^F).s
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
 $(KERNEL_BIN): $(KERNEL_OBJS)
@@ -34,6 +35,7 @@ clean:
 	$(CC) $(CFLAGS) $^ -o $@
 
 %.s.o: %.s
+	$(ASM) $(ASMFLAGS) -e $^ >$(^F).s
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
 run: os.img

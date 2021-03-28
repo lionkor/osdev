@@ -29,21 +29,32 @@ start:
     mov ax, S_OK
     call print_line
 
+    mov ax, S_SWITCHING_TO_PM
+    call print
+
+    call switch_to_pm ; noreturn
+
     jmp $
 
-S_BOOTING_OS db 'booting lkOS v1.0', 0
+S_BOOTING_OS db 'lkOS v1.0\n\r16-bit real mode', 0
 S_SETTING_UP_STACK db 'setting up stack... ', 0
 S_READING_FROM_DISK db 'reading initial data from disk... ', 0
+S_SWITCHING_TO_PM db 'switching to 32-bit protected mode... ', 0
 S_OK db "ok!", 0
 
 ; global variables
 
 BOOT_DRIVE db 0
 
+%include "switch_to_pm.s"
+%include "print_pm.s"
+
+BEGIN_PM: ; called once we're in protected mode!
+    mov edx, S_OK
+    call print_pm
+    jmp $
+
 ; padding and magic
 times 510 - ($ - $$) db 0
 dw 0xaa55
 
-; some verifyable data
-times 256 dw 0xdada
-times 256 dw 0xface
