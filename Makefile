@@ -20,18 +20,18 @@ LIBC_OBJS = \
 
 .PHONY: all
 
-all: libc.a os.iso
+all:  os.iso
 
 libc.a: $(LIBC_OBJS)
 	ar rcs -o $@ $^
 
-os.iso: os.bin
+os.iso: libc.a os.bin
 	mkdir -p isodir/boot/grub
 	cp $< isodir/boot/os.bin
 	cp grub.cfg isodir/boot/grub/grub.cfg
 	grub-mkrescue -o os.iso isodir
 
-os.bin: $(KERNEL_ELF)
+os.bin: $(KERNEL_ELF) 
 	cp $< $@
 	./check-multiboot.sh $@
 
@@ -39,7 +39,8 @@ $(KERNEL_ELF): src/kernel/kernel_entry.s.o $(KERNEL_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -lc -L.
 
 clean:
-	@rm -vf *.bin *.c.s *.o src/*.c.s os.img src/*.o src/*/*.o src/*/*/*.o *.elf *.img *.iso
+	@rm -vf *.bin *.c.s *.o src/*.c.s os.img src/*.o src/*/*.o src/*/*/*.o *.elf *.img *.iso \
+		*.a
 
 %.c.o: %.c
 	$(CC) $(CFLAGS) -c $^ -o $@

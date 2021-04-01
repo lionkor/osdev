@@ -14,7 +14,7 @@ static inline u16 vga_entry(u8 uc, u8 color) {
 
 static const size_t VGA_WIDTH = 80;
 static const size_t VGA_HEIGHT = 25;
-static u16* const VGA_MEMORY = (u16*)0xB8000;
+static u16* const VGA_MEMORY = (u16*) 0xB8000;
 
 size_t terminal_row;
 size_t terminal_column;
@@ -38,33 +38,77 @@ void terminal_setcolor(u8 color) {
     terminal_color = color;
 }
 
+void terminal_scroll(i32 line) {
+    i32 loop;
+    char c;
+
+    for(loop = line * (VGA_WIDTH * 2) + VGA_MEMORY; loop < VGA_WIDTH * 2; loop++) {
+        c = *loop;
+        *(loop - (VGA_WIDTH * 2)) = c;
+    }
+}
+
 void terminal_putentryat(char c, u8 color, size_t x, size_t y) {
     const size_t index = y * VGA_WIDTH + x;
     terminal_buffer[index] = vga_entry(c, color);
 }
 
 void terminal_putchar(char c) {
-    if (c != '\n') {
-        terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
-        if (++terminal_column >= VGA_WIDTH) {
-            terminal_column = 0;
-            if (++terminal_row >= VGA_HEIGHT)
-                terminal_row = 0;
-        }
-    } else {
-        /*terminal_column = 0;
-        if (++terminal_row >= VGA_HEIGHT)
+    terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+    if (++terminal_column == VGA_WIDTH) {
+        terminal_column = 0;
+        if (++terminal_row == VGA_HEIGHT)
             terminal_row = 0;
-            */
     }
 }
 
 void terminal_write(const char* data, size_t size) {
     for (size_t i = 0; i < size; i++) {
-        terminal_putchar(data[i]);
+        if (data[i] == '\n') {
+            ++terminal_row;
+            terminal_column = 0;
+        } else {
+            terminal_putchar(data[i]);
+        }
     }
 }
 
 void terminal_writestring(const char* data) {
     terminal_write(data, strlen(data));
+}
+
+void kprint(const char* data) {
+    terminal_writestring(data);
+}
+
+void kprint_c(const char* data, enum vga_color color) {
+    // push old color
+    enum vga_color old_color = terminal_color;
+    terminal_setcolor(color);
+    terminal_writestring(data);
+    terminal_setcolor(old_color);
+}
+
+#define print_kernel() kprint("[kernel] ")
+
+void kperror(const char* data) {
+    print_kernel();
+    kprint_c("error", VGA_COLOR_LIGHT_RED);
+    kprint(": ");
+    kprint(data);
+    kprint("\n");
+}
+
+void kpwarning(const char* data) {
+    print_kernel();
+    kprint_c("warning", VGA_COLOR_LIGHT_BLUE);
+    kprint(": ");
+    kprint(data);
+    kprint("\n");
+}
+
+void kplog(const char* data) {
+    print_kernel();
+    kprint(data);
+    kprint("\n");
 }

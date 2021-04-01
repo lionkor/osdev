@@ -27,11 +27,3 @@ void terminal_putentryat(char c, u8 color, size_t x, size_t y);
 void terminal_putchar(char c);
 void terminal_write(const char* data, size_t size);
 void terminal_writestring(const char* data);
-
-// alias for terminal_writestring
-void kprint(const char* data);
-void kprint_c(const char* data, enum vga_color color);
-// the following append \n
-void kperror(const char* data);
-void kpwarning(const char* data);
-void kplog(const char* data);
