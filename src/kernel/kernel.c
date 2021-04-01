@@ -1,5 +1,4 @@
 #include "screen.h"
-#include "serial.h"
 
 void kernel_main(void) {
     terminal_initialize();
