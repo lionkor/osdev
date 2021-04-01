@@ -43,6 +43,6 @@ run: os.iso
 	- qemu-system-i386 -cdrom os.iso --enable-kvm &
 
 debug: os.iso
-	- qemu-system-i386 -cdrom os.iso -s -S --enable-kvm &
+	- qemu-system-i386 -kernel os.bin -s -S --enable-kvm &
 	- gdb -x gdbcommands.gdb
 
