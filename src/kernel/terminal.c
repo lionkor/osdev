@@ -58,10 +58,51 @@ void terminal_putchar(char c) {
 
 void terminal_write(const char* data, size_t size) {
     for (size_t i = 0; i < size; i++) {
-        terminal_putchar(data[i]);
+        if (data[i] == '\n') {
+            ++terminal_row;
+            terminal_column = 0;
+        } else {
+            terminal_putchar(data[i]);
+        }
     }
 }
 
 void terminal_writestring(const char* data) {
     terminal_write(data, strlen(data));
+}
+
+void kprint(const char* data) {
+    terminal_writestring(data);
+}
+
+void kprint_c(const char* data, enum vga_color color) {
+    // push old color
+    enum vga_color old_color = terminal_color;
+    terminal_setcolor(color);
+    terminal_writestring(data);
+    terminal_setcolor(old_color);
+}
+
+#define print_kernel() kprint("[kernel] ")
+
+void kperror(const char* data) {
+    print_kernel();
+    kprint_c("error", VGA_COLOR_LIGHT_RED);
+    kprint(": ");
+    kprint(data);
+    kprint("\n");
+}
+
+void kpwarning(const char* data) {
+    print_kernel();
+    kprint_c("warning", VGA_COLOR_LIGHT_BLUE);
+    kprint(": ");
+    kprint(data);
+    kprint("\n");
+}
+
+void kplog(const char* data) {
+    print_kernel();
+    kprint(data);
+    kprint("\n");
 }

@@ -13,9 +13,17 @@ KERNEL_OBJS = \
 	$(patsubst %.c,%.c.o,$(wildcard src/kernel/*/*.c)) \
 	$(patsubst %.c,%.c.o,$(wildcard src/kernel/*/*/*.c)) \
 
+LIBC_OBJS = \
+	$(patsubst %.c,%.c.o,$(wildcard src/libc/*.c)) \
+	$(patsubst %.c,%.c.o,$(wildcard src/libc/*/*.c)) \
+	$(patsubst %.c,%.c.o,$(wildcard src/libc/*/*/*.c)) \
+
 .PHONY: all
 
-all: os.iso
+all: libc.a os.iso
+
+libc.a: $(LIBC_OBJS)
+	ar rcs -o $@ $^
 
 os.iso: os.bin
 	mkdir -p isodir/boot/grub
@@ -28,7 +36,7 @@ os.bin: $(KERNEL_ELF)
 	./check-multiboot.sh $@
 
 $(KERNEL_ELF): src/kernel/kernel_entry.s.o $(KERNEL_OBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@ -lc -L.
 
 clean:
 	@rm -vf *.bin *.c.s *.o src/*.c.s os.img src/*.o src/*/*.o src/*/*/*.o *.elf *.img *.iso
@@ -40,7 +48,7 @@ clean:
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
 run: os.iso
-	- qemu-system-i386 -cdrom os.iso --enable-kvm &
+	- qemu-system-i386 -kernel os.bin --enable-kvm &
 
 debug: os.iso
 	- qemu-system-i386 -kernel os.bin -s -S --enable-kvm &
