@@ -12,6 +12,6 @@
 
 void clear_screen();
 // specify negative values for col, row to auto-calculate them
-void kprint_at(char* msg, i32 col, i32 row);
+void kprint_at(const char* msg, i32 col, i32 row);
 // equivalent to kprint_at(msg, -1, -1)
-void kprint(char* msg);
+void kprint(const char* msg);

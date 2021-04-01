@@ -8,7 +8,7 @@ i32 get_offset(i32 col, i32 row);
 i32 get_offset_row(i32 offset);
 i32 get_offset_col(i32 offset);
 
-void kprint_at(char* msg, i32 col, i32 row) {
+void kprint_at(const char* msg, i32 col, i32 row) {
     i32 offset = 0;
     if (col >= 0 && row >= 0) {
         offset = get_offset(col, row);
@@ -26,7 +26,7 @@ void kprint_at(char* msg, i32 col, i32 row) {
     }
 }
 
-void kprint(char* msg) {
+void kprint(const char* msg) {
     kprint_at(msg, -1, -1);
 }
 
