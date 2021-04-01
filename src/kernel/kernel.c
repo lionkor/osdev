@@ -1,12 +1,9 @@
 #include "screen.h"
 #include "serial.h"
 
-void main() {
-    if (!init_serial()) {
-        // do nothing
-    }
-    clear_screen();
-    kprint("hello, world!");
-    while (1) {
+void kernel_main(void) {
+    terminal_initialize();
+    terminal_writestring("What's up!");
+    while (true) {
     }
 }

@@ -20,12 +20,12 @@ disk_load:
 _disk_load_disk_error:
     mov ax, S_DISK_ERROR
     call print_line
-    jmp $
+    ret
 
 _disk_load_disk_error_n:
     mov ax, S_DISK_ERROR_N
     call print_line
-    jmp $
+    ret
 
 S_DISK_ERROR db "error: disk read failed", 0
 S_DISK_ERROR_N db "error: disk read failed (read != to_read)", 0

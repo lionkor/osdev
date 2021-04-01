@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../types.h"
+#include <ktypes.h>
 
 #define PORT 0x3f8
 

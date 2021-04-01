@@ -5,7 +5,7 @@ STRIP=objcopy
 OBJCONV=objconv
 ASMFLAGS = -f bin -i src -w+all -i src/boot
 ASMFLAGS_ELF = -f elf -i src -w+all -i src/boot
-CFLAGS = -c -Wall -Wextra -O0 -ffreestanding -fno-pie -g
+CFLAGS = -c -Wall -Wextra -O0 -ffreestanding -fno-pie -g -Isrc/libc
 STRIPFLAGS = -R .comment -R .gnu.version -R .note -R .eh_frame -R .eh_frame_hdr -R .note.gnu.property
 LDFLAGS = -Ttext 0x1000 --oformat binary
 OBJCONVFLAGS = -fnasm
@@ -37,7 +37,7 @@ clean:
 	@rm -vf src/*.o src/*/*.o src/*/*/*.o
 
 src/kernel/kernel_entry.s.o: src/kernel/kernel_entry.s
-	$(ASM) $(ASMFLAGS_ELF) $^ -o $@
+	$(ASM) $(ASMFLAGS_ELF) $< -o $@
 
 %.c.o: %.c
 	$(CC) $(CFLAGS) $^ -o $@
@@ -47,10 +47,10 @@ src/kernel/kernel_entry.s.o: src/kernel/kernel_entry.s
 	$(ASM) $(ASMFLAGS) $^ -o $@
 
 run: os.img
-	- qemu-system-i386 -serial telnet:localhost:4321,server,nowait -drive format=raw,file=$< &
+	- qemu-system-i386 -serial telnet:localhost:4321,server,nowait -drive format=raw,file=$< --enable-kvm &
 
 debug: os.img $(KERNEL_ELF)
-	- qemu-system-i386 -serial telnet:localhost:4321,server,nowait -drive format=raw,file=$< -s -S &
+	- qemu-system-i386 -serial telnet:localhost:4321,server,nowait -drive format=raw,file=$< -s -S --enable-kvm &
 	- gdb -x gdbcommands.gdb
 
 # debugging binary

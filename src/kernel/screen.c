@@ -1,100 +1,66 @@
 #include "screen.h"
 #include "ports.h"
+#include <ktypes.h>
 
-int get_cursor_offset();
-void set_cursor_offset(i32 offset);
-i32 print_char(char c, i32 col, i32 row, char attr);
-i32 get_offset(i32 col, i32 row);
-i32 get_offset_row(i32 offset);
-i32 get_offset_col(i32 offset);
+static inline u8 vga_entry_color(enum vga_color fg, enum vga_color bg) {
+    return fg | bg << 4;
+}
 
-void kprint_at(const char* msg, i32 col, i32 row) {
-    i32 offset = 0;
-    if (col >= 0 && row >= 0) {
-        offset = get_offset(col, row);
-    } else {
-        offset = get_cursor_offset();
-        row = get_offset_row(offset);
-        col = get_offset_col(offset);
+static inline u16 vga_entry(u8 uc, u8 color) {
+    return (u16)uc | (u16)color << 8;
+}
+
+size_t strlen(const char* str) {
+    size_t len = 0;
+    while (str[len])
+        len++;
+    return len;
+}
+
+static const size_t VGA_WIDTH = 80;
+static const size_t VGA_HEIGHT = 25;
+
+size_t terminal_row;
+size_t terminal_column;
+u8 terminal_color;
+u16* terminal_buffer;
+
+void terminal_initialize(void) {
+    terminal_row = 0;
+    terminal_column = 0;
+    terminal_color = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
+    terminal_buffer = (u16*)0xB8000;
+    for (size_t y = 0; y < VGA_HEIGHT; y++) {
+        for (size_t x = 0; x < VGA_WIDTH; x++) {
+            const size_t index = y * VGA_WIDTH + x;
+            terminal_buffer[index] = vga_entry(' ', terminal_color);
+        }
     }
+}
 
-    int i = 0;
-    while (msg[i] != 0) {
-        offset = print_char(msg[i++], col, row, WHITE_ON_BLACK);
-        row = get_offset_row(offset);
-        col = get_offset_col(offset);
+void terminal_setcolor(u8 color) {
+    terminal_color = color;
+}
+
+void terminal_putentryat(char c, u8 color, size_t x, size_t y) {
+    const size_t index = y * VGA_WIDTH + x;
+    terminal_buffer[index] = vga_entry(c, color);
+}
+
+void terminal_putchar(char c) {
+    terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
+    if (++terminal_column == VGA_WIDTH) {
+        terminal_column = 0;
+        if (++terminal_row == VGA_HEIGHT)
+            terminal_row = 0;
     }
 }
 
-void kprint(const char* msg) {
-    kprint_at(msg, -1, -1);
+void terminal_write(const char* data, size_t size) {
+    for (size_t i = 0; i < size; i++)
+        terminal_putchar(data[i]);
 }
 
-i32 print_char(char c, i32 col, i32 row, char attr) {
-    u8* vm = (u8*)VIDEO_ADDRESS;
-    if (!attr) {
-        attr = WHITE_ON_BLACK;
-    }
-    // print red E on error
-    if (col >= MAX_COLS || row >= MAX_ROWS) {
-        vm[2 * (MAX_COLS) * (MAX_ROWS)-2] = 'E';
-        vm[2 * (MAX_COLS) * (MAX_ROWS)-1] = RED_ON_WHITE;
-        return get_offset(col, row);
-    }
-    i32 offset = 0;
-    if (col >= 0 && row >= 0) {
-        offset = get_offset(col, row);
-    } else {
-        offset = get_cursor_offset();
-    }
-
-    if (c == '\n') {
-        row = get_offset_row(offset);
-        offset = get_offset(0, row + 1);
-    } else {
-        vm[offset] = c;
-        vm[offset + 1] = attr;
-        offset += 2;
-    }
-    set_cursor_offset(offset);
-    return offset;
-}
-
-i32 get_cursor_offset() {
-    i32 offset = 0;
-    port_byte_out(REG_SCREEN_CTRL, 0x0f); // low byte
-    offset |= port_byte_in(REG_SCREEN_DATA);
-    port_byte_out(REG_SCREEN_CTRL, 0x0e); // high byte
-    offset |= ((u16)port_byte_in(REG_SCREEN_DATA)) << 8;
-    return offset;
-}
-
-void set_cursor_offset(i32 offset) {
-    // TODO: offset/=2 ??
-    port_byte_out(REG_SCREEN_CTRL, 0x0f);
-    port_byte_out(REG_SCREEN_DATA, (u8)(offset & 0xff));
-    port_byte_out(REG_SCREEN_CTRL, 0x0e);
-    port_byte_out(REG_SCREEN_DATA, (u8)((offset >> 8) & 0xff));
-}
-
-void clear_screen() {
-    i32 screen_size = MAX_COLS * MAX_ROWS;
-    u8* vm = (u8*)VIDEO_ADDRESS;
-    for (i32 i = 0; i < screen_size; ++i) {
-        vm[i * 2] = ' ';
-        vm[i * 2 + 1] = WHITE_ON_BLACK;
-    }
-    set_cursor_offset(get_offset(0, 0));
-}
-
-i32 get_offset(i32 col, i32 row) {
-    return 2 * (row * MAX_COLS + col);
-}
-
-i32 get_offset_row(i32 offset) {
-    return offset / (2 * MAX_COLS);
-}
-
-i32 get_offset_col(i32 offset) {
-    return (offset - (get_offset_row(offset) * 2 * MAX_COLS)) / 2;
+void terminal_writestring(const char* data) {
+    terminal_write(data, strlen(data));
 }

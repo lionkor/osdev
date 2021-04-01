@@ -32,7 +32,7 @@ load_kernel:
     call print
                             ; load from disk:
     mov bx, KERNEL_OFFSET   ; to kernel_offset
-    mov dh, 13              ; 15 sectors (boot sector is skipped by routine)
+    mov dh, 6               ; 15 sectors (boot sector is skipped by routine)
     mov dl, [BOOT_DRIVE]    ; from this drive
     call disk_load
 
