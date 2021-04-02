@@ -13,6 +13,4 @@ void kernel_main(void) {
     kprint("\n");
     kprint_hex_8(0x69);
     kprint("\n");
-    for (size_t i = 0; i < 5000; ++i) {
-    }
 }

@@ -1,7 +1,7 @@
 #include "kprint.h"
 
-#include <string.h>
 #include <binops.h>
+#include <string.h>
 
 #define print_kernel() kprint_internal("[kernel] ", VGA_COLOR_LIGHT_GREY)
 
@@ -106,13 +106,13 @@ void kprint_init() {
     kprint_flush();
 }
 
-static const char hex_map[] = "0123456789abcdef";
+#define KPRINT_NUMBER_COLOR VGA_COLOR_CYAN
 
 void kprint_hex_8(u8 data) {
     // 0x00
     char buf[] = "0x00";
     u8_to_hex(data, buf + 2);
-    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
 }
 
@@ -120,7 +120,7 @@ void kprint_hex_16(u16 data) {
     // 0x00'00
     char buf[] = "0x0000";
     u16_to_hex(data, buf + 2);
-    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
 }
 
@@ -128,7 +128,7 @@ void kprint_hex_32(u32 data) {
     // 0x00'00'00'00
     char buf[] = "0x00000000";
     u32_to_hex(data, buf + 2);
-    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
 }
 
@@ -140,7 +140,7 @@ void kprint_bin_8(u8 data) {
         buf[sizeof(buf) - 2 - i] = '0' + bit;
     }
     buf[sizeof(buf) - 1] = 0;
-    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
 }
 
@@ -152,7 +152,7 @@ void kprint_bin_16(u16 data) {
         buf[sizeof(buf) - 2 - i] = '0' + bit;
     }
     buf[sizeof(buf) - 1] = 0;
-    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
 }
 
@@ -164,6 +164,6 @@ void kprint_bin_32(u32 data) {
         buf[sizeof(buf) - 2 - i] = '0' + bit;
     }
     buf[sizeof(buf) - 1] = 0;
-    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
 }
