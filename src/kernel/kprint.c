@@ -36,9 +36,9 @@ void kprint_internal(const char* data, u8 color) {
         if (data[i] == '\n') {
             // clear the rest of the line
             size_t cur = current_x + W * current_y;
-            for (size_t i = cur; i < cur + (W - current_x); ++i) {
-                buffer[i] = ' ';
-                colors[i] = color;
+            for (size_t k = cur; k < cur + (W - current_x); ++k) {
+                buffer[k] = ' ';
+                colors[k] = color;
             }
             current_x = 0;
             current_y += 1;
@@ -102,5 +102,72 @@ void kprint_init() {
         buffer[i] = ' ';
         colors[i] = VGA_COLOR_LIGHT_GREY;
     }
+    kprint_flush();
+}
+
+static const char hex_map[] = "0123456789abcdef";
+
+void kprint_hex_8(u8 data) {
+    // 0x00
+    char buf[5];
+    buf[0] = '0';
+    buf[1] = 'x';
+    buf[2] = hex_map[(data % 0x0f)];
+    buf[3] = hex_map[(data % 0xf0) / 0x10];
+    buf[4] = '\0';
+    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_flush();
+}
+
+void kprint_hex_16(u16 data) {
+}
+
+void kprint_hex_32(u32 data) {
+    // 0x00'00'00'00
+    char buf[] = "0x00000000";
+
+    for (u8 i = 0; i < 8; i += 2) {
+        buf[sizeof(buf) - 2 - i - 1] = hex_map[(data % 0x0f)];
+        buf[sizeof(buf) - 2 - i] = hex_map[(data % 0xf0) / 0x10];
+        data >>= 1;
+    }
+
+    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_flush();
+}
+
+void kprint_bin_8(u8 data) {
+    char buf[] = "0b00000000";
+    for (size_t i = 0; i < 8; ++i) {
+        bool bit = data % 2;
+        data /= 2;
+        buf[sizeof(buf) - 2 - i] = '0' + bit;
+    }
+    buf[sizeof(buf) - 1] = 0;
+    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_flush();
+}
+
+void kprint_bin_16(u16 data) {
+    char buf[] = "0b0000000000000000";
+    for (size_t i = 0; i < 16; ++i) {
+        bool bit = data % 2;
+        data /= 2;
+        buf[sizeof(buf) - 2 - i] = '0' + bit;
+    }
+    buf[sizeof(buf) - 1] = 0;
+    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_flush();
+}
+
+void kprint_bin_32(u32 data) {
+    char buf[] = "0b00000000000000000000000000000000";
+    for (size_t i = 0; i < 32; ++i) {
+        bool bit = data % 2;
+        data /= 2;
+        buf[sizeof(buf) - 2 - i] = '0' + bit;
+    }
+    buf[sizeof(buf) - 1] = 0;
+    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
     kprint_flush();
 }
