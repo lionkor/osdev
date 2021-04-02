@@ -1,6 +1,7 @@
 #include "kprint.h"
 
 #include <string.h>
+#include <binops.h>
 
 #define print_kernel() kprint_internal("[kernel] ", VGA_COLOR_LIGHT_GREY)
 
@@ -109,29 +110,24 @@ static const char hex_map[] = "0123456789abcdef";
 
 void kprint_hex_8(u8 data) {
     // 0x00
-    char buf[5];
-    buf[0] = '0';
-    buf[1] = 'x';
-    buf[2] = hex_map[(data % 0x0f)];
-    buf[3] = hex_map[(data % 0xf0) / 0x10];
-    buf[4] = '\0';
+    char buf[] = "0x00";
+    u8_to_hex(data, buf + 2);
     kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
     kprint_flush();
 }
 
 void kprint_hex_16(u16 data) {
+    // 0x00'00
+    char buf[] = "0x0000";
+    u16_to_hex(data, buf + 2);
+    kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
+    kprint_flush();
 }
 
 void kprint_hex_32(u32 data) {
     // 0x00'00'00'00
     char buf[] = "0x00000000";
-
-    for (u8 i = 0; i < 8; i += 2) {
-        buf[sizeof(buf) - 2 - i - 1] = hex_map[(data % 0x0f)];
-        buf[sizeof(buf) - 2 - i] = hex_map[(data % 0xf0) / 0x10];
-        data >>= 1;
-    }
-
+    u32_to_hex(data, buf + 2);
     kprint_internal(buf, VGA_COLOR_LIGHT_GREEN);
     kprint_flush();
 }
