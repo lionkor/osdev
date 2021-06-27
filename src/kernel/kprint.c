@@ -71,52 +71,12 @@ void kprint(const char* data) {
 }
 
 void kprintf(const char* fmt, ...) {
+    print_kernel();
     // first elem after first arg
     char buf[256];
-    size_t fmtlen = strlen(fmt);
-    if (fmtlen > 240) {
-        kpanic("kprintf can't do strings longer than 256 characters.");
-    }
     va_list args;
     va_start(args, fmt);
-    // use va_arg to get the next arg
-    size_t k = 0;
-    for (size_t i = 0; i < fmtlen; ++i) {
-        char c = fmt[i];
-        switch (c) {
-        case '%': {
-            ++i;
-            if (i >= fmtlen) {
-                break;
-            }
-            c = fmt[i];
-            switch (c) {
-            case '%': { // %%
-                buf[k++] = '%';
-                break;
-            }
-            case 'x': { // %x
-                const char* b = "0x00000000";
-                memcpy(&buf[k], b, 10);
-                k += 2; // for 0x
-                u32_to_hex(va_arg(args, uint32_t), &buf[k]);
-                k += 8; // for the 8 0's
-                break;
-            }
-            default: {
-                // unknown format specifier
-                kpanic("unknown format specifier.");
-            }
-            }
-
-            break;
-        }
-        default: {
-            buf[k++] = c;
-            break;
-        }
-        }
-    }
+    vsprintf(buf, fmt, args);
     va_end(args);
     kprint(buf);
     kprint_flush();

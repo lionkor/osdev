@@ -2,7 +2,6 @@
 
 #include "terminal.h"
 
-
 void kprint_init(void);
 // alias for terminal_writestring
 void kprint(const char* data);
