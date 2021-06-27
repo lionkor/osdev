@@ -20,3 +20,17 @@ void u32_to_hex(u32 x, char* buf) {
         x >>= 4;
     }
 }
+
+void u32_to_dec(u32 x, char* buf) {
+    u32 multiplier = 1;
+    u32 i = 0;
+    while (true) {
+        buf[0] = '0' + (x & 0xf) * multiplier;
+        x >>= 4;
+        multiplier *= 16;
+        ++i;
+        if (x == 0) {
+            break;
+        }
+    }
+}
