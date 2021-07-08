@@ -12,15 +12,17 @@ LDFLAGS = -T src/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 OBJCONVFLAGS = -fnasm
 KERNEL_ELF = kernel.elf
 KERNEL_OBJS = \
-    src/kernel/kpanic.c.o \
-    src/kernel/kprint.c.o \
-    src/kernel/ports.c.o \
-    src/kernel/terminal.c.o \
-	src/kernel/kernel.c.o
+    src/kernel/kpanic.o \
+    src/kernel/kprint.o \
+    src/kernel/ports.o \
+    src/kernel/terminal.o \
+    src/kernel/enter_v86.s.o \
+    src/kernel/kernel_entry.s.o \
+	src/kernel/kernel.o
 
 LIBC_OBJS = \
-    src/libc/string.c.o \
-	src/libc/binops.c.o
+    src/libc/string.o \
+	src/libc/binops.o
 
 .PHONY: all
 
@@ -45,9 +47,6 @@ $(KERNEL_ELF): src/kernel/kernel_entry.s.o $(KERNEL_OBJS)
 clean:
 	@rm -vf *.bin *.c.s *.o src/*.c.s os.img src/*.o src/*/*.o src/*/*/*.o *.elf *.img *.iso \
 		*.a
-
-%.c.o: %.c
-	$(CC) $(CFLAGS) -c $^ -o $@
 
 %.s.o: %.s
 	$(ASM) $(ASMFLAGS) $^ -o $@
