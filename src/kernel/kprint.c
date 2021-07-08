@@ -73,7 +73,7 @@ void kprint(const char* data) {
 void kprintf(const char* fmt, ...) {
     print_kernel();
     // first elem after first arg
-    char buf[256];
+    char buf[KERNEL_PRINTF_MAXLEN];
     va_list args;
     va_start(args, fmt);
     vsprintf(buf, fmt, args);
@@ -93,6 +93,34 @@ void kperror(const char* data) {
     kprint_internal(": ", VGA_COLOR_LIGHT_GREY);
     kprint_internal(data, VGA_COLOR_LIGHT_GREY);
     kprint_internal("\n", VGA_COLOR_LIGHT_GREY);
+    kprint_flush();
+}
+
+void kpferror(const char* fmt, ...) {
+    print_kernel();
+    // first elem after first arg
+    char buf[KERNEL_PRINTF_MAXLEN];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+    kprint_internal("error", VGA_COLOR_LIGHT_RED);
+    kprint_internal(": ", VGA_COLOR_LIGHT_GREY);
+    kprint(buf);
+    kprint_flush();
+}
+
+void kpfwarning(const char* fmt, ...) {
+    print_kernel();
+    // first elem after first arg
+    char buf[KERNEL_PRINTF_MAXLEN];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+    kprint_internal("error", VGA_COLOR_LIGHT_RED);
+    kprint_internal(": ", VGA_COLOR_LIGHT_GREY);
+    kprint(buf);
     kprint_flush();
 }
 

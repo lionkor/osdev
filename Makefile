@@ -3,20 +3,24 @@ CC=i686-elf-gcc
 STRIP=objcopy
 OBJCONV=objconv
 ASMFLAGS = -f elf32 -i src -w+all -i src/kernel
-CFLAGS = -Wall -Wextra -ffreestanding -g -Isrc/libc -std=gnu17 -O2
+CFLAGS = -Wall -Wextra -ffreestanding -g -Isrc/libc -std=gnu17 -O2 \
+	-fanalyzer -Wmissing-prototypes \
+	-Wmissing-declarations -Winline -Wpedantic -Wvla \
+	-Werror=incompatible-pointer-types
 STRIPFLAGS = -R .comment -R .gnu.version -R .note -R .eh_frame -R .eh_frame_hdr -R .note.gnu.property
 LDFLAGS = -T src/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 OBJCONVFLAGS = -fnasm
 KERNEL_ELF = kernel.elf
 KERNEL_OBJS = \
-	$(patsubst %.c,%.c.o,$(wildcard src/kernel/*.c)) \
-	$(patsubst %.c,%.c.o,$(wildcard src/kernel/*/*.c)) \
-	$(patsubst %.c,%.c.o,$(wildcard src/kernel/*/*/*.c)) \
+    src/kernel/kpanic.c.o \
+    src/kernel/kprint.c.o \
+    src/kernel/ports.c.o \
+    src/kernel/terminal.c.o \
+	src/kernel/kernel.c.o
 
 LIBC_OBJS = \
-	$(patsubst %.c,%.c.o,$(wildcard src/libc/*.c)) \
-	$(patsubst %.c,%.c.o,$(wildcard src/libc/*/*.c)) \
-	$(patsubst %.c,%.c.o,$(wildcard src/libc/*/*/*.c)) \
+    src/libc/string.c.o \
+	src/libc/binops.c.o
 
 .PHONY: all
 

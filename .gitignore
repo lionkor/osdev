@@ -1,4 +1,8 @@
 *.bin
 *.o
 *.img
-
+isodir/
+*.elf
+*.a
+*.iso
+osdev.*

@@ -83,6 +83,9 @@ int vsprintf(char* buf, const char* fmt, va_list args) {
             }
             case 's': { // %s - null terminated string
                 const char* str = va_arg(args, const char*);
+                if (str == NULL) {
+                    str = "(null)";
+                }
                 size_t len = strlen(str);
                 memcpy(&buf[k], str, len);
                 k += len;
