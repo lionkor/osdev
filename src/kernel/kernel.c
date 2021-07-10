@@ -3,8 +3,6 @@
 #include <binops.h>
 #include <ktypes.h>
 
-#include "!
-
 void kernel_main(void) {
     terminal_initialize();
     kplog("welcome to lkOS");

@@ -12,11 +12,12 @@ LDFLAGS = -T src/linker.ld -ffreestanding -O2 -nostdlib -lgcc
 OBJCONVFLAGS = -fnasm
 KERNEL_ELF = kernel.elf
 KERNEL_OBJS = \
+    src/kernel/drivers/vga/vga.o \
     src/kernel/kpanic.o \
     src/kernel/kprint.o \
     src/kernel/ports.o \
     src/kernel/terminal.o \
-    src/kernel/enter_v86.s.o \
+    src/kernel/v86.s.o \
     src/kernel/kernel_entry.s.o \
 	src/kernel/kernel.o
 
