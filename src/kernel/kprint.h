@@ -24,3 +24,5 @@ void kprint_hex_32(u32 data);
 void kprint_bin_8(u8 data);
 void kprint_bin_16(u16 data);
 void kprint_bin_32(u32 data);
+
+void kprintf_serial(const char* fmt, ...);

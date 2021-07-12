@@ -3,8 +3,10 @@
 
 #include <binops.h>
 #include <stdarg.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+
+#include "drivers/serial/serial.h"
 
 #define print_kernel() kprint_internal("[kernel] ", VGA_COLOR_LIGHT_GREY)
 
@@ -209,4 +211,18 @@ void kprint_bin_32(u32 data) {
     buf[sizeof(buf) - 1] = 0;
     kprint_internal(buf, KPRINT_NUMBER_COLOR);
     kprint_flush();
+}
+
+void kprintf_serial(const char* fmt, ...) {
+    char buf[KERNEL_PRINTF_MAXLEN];
+    va_list args;
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    va_end(args);
+    for (char* c = buf; *c; ++c) {
+        if (*c == '\n') {
+            drv_serial_write('\r');
+        }
+        drv_serial_write(*c);
+    }
 }
