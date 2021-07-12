@@ -3,7 +3,7 @@ CC=i686-elf-gcc
 STRIP=objcopy
 OBJCONV=objconv
 ASMFLAGS = -f elf32 -i src -w+all -i src/kernel
-CFLAGS = -Wall -Wextra -ffreestanding -g -Isrc/libc -std=gnu17 -O2 \
+CFLAGS = -Wall -Wextra -ffreestanding -g -Isrc/libc -Isrc -std=gnu17 -O2 \
 	-fanalyzer -Wmissing-prototypes \
 	-Wmissing-declarations -Winline -Wpedantic -Wvla \
 	-Werror=incompatible-pointer-types
@@ -13,6 +13,8 @@ OBJCONVFLAGS = -fnasm
 KERNEL_ELF = kernel.elf
 KERNEL_OBJS = \
     src/kernel/drivers/vga/vga.o \
+    src/kernel/drivers/serial/serial.o \
+	src/kernel/drivers/driver_utils.o \
     src/kernel/kpanic.o \
     src/kernel/kprint.o \
     src/kernel/ports.o \
@@ -23,6 +25,7 @@ KERNEL_OBJS = \
 
 LIBC_OBJS = \
     src/libc/string.o \
+    src/libc/stdio.o \
 	src/libc/binops.o
 
 .PHONY: all

@@ -15,4 +15,5 @@
 #define DRV_VGA_PORT_3ce 0x3ce
 #define DRV_VGA_PORT_3d4 0x3d4
 
-void drv_vga_write_graphics_mode(u8 byte);
+void drv_vga_set_graphics_write_mode(void);
+void drv_vga_set_graphics_read_mode(void);

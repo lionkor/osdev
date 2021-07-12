@@ -4,6 +4,7 @@
 #include <binops.h>
 #include <stdarg.h>
 #include <string.h>
+#include <stdio.h>
 
 #define print_kernel() kprint_internal("[kernel] ", VGA_COLOR_LIGHT_GREY)
 
@@ -16,7 +17,7 @@ static u8 colors[W * H];
 static size_t current_x = 0;
 static size_t current_y = 0;
 
-static inline void kprint_flush(void) {
+void kprint_flush(void) {
     for (size_t x = 0; x < W; ++x) {
         for (size_t y = 0; y < H; ++y) {
             terminal_putentryat(buffer[x + y * W], colors[x + y * W], x, y);
@@ -34,7 +35,7 @@ static inline void scroll() {
     }
 }
 
-void kprint_internal(const char* data, u8 color) {
+static void kprint_internal(const char* data, u8 color) {
     for (size_t i = 0; data[i]; ++i) {
         if (data[i] == '\n') {
             // clear the rest of the line
