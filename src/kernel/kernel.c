@@ -4,6 +4,7 @@
 #include <ktypes.h>
 
 #include <kernel/drivers/driver_utils.h>
+#include "v86.h"
 #include <kernel/drivers/serial/serial.h>
 
 void kernel_main(void) {
@@ -18,4 +19,6 @@ void kernel_main(void) {
     kpferror("Well, %s, this is kinda awkward! I got: %s, %s!\n", "lion", NULL, "uwu");
     kprintf("Writing to serial!\n");
     kprintf_serial("Hello, Serial!\n");
+    
+    enter_v86()
 }
