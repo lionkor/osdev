@@ -1,4 +1,5 @@
 global enter_v86
+global easy_enter_v86
 ; void enter_v86(uint32_t ss, uint32_t esp, uint32_t cs, uint32_t eip);
 enter_v86:
    mov ebp, esp               ; save stack pointer
@@ -9,3 +10,10 @@ enter_v86:
    push dword [ebp+12]        ; cs
    push dword  [ebp+16]       ; eip
    iret
+
+
+; void easy_enter_v86(void);
+
+easy_enter_v86:
+    
+

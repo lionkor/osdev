@@ -20,6 +20,4 @@ void kernel_main(void) {
     kpferror("Well, %s, this is kinda awkward! I got: %s, %s!\n", "lion", "NOTHING", "uwu");
     kprintf("Writing to serial!\n");
     kprintf_serial("Hello, Serial!\n");
-    
-    //enter_v86();
 }
