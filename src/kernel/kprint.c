@@ -38,6 +38,7 @@ static inline void scroll() {
 }
 
 static void kprint_internal(const char* data, u8 color) {
+    kprintf_serial("%s", data);
     for (size_t i = 0; data[i]; ++i) {
         if (data[i] == '\n') {
             // clear the rest of the line
